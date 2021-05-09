@@ -27,8 +27,8 @@ uint8_t gamma8[] = {
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B
 
-#define BRIGHTNESS 64
-#define UPDATES_PER_SECOND 20
+#define BRIGHTNESS 128
+#define UPDATES_PER_SECOND 60
 
 #define HEIGHT 14
 #define NUM_LEDS (HEIGHT * 2)
@@ -37,14 +37,15 @@ CRGB leds[ NUM_LEDS ];
 uint8_t tbuff[2][HEIGHT+1][2];
 uint8_t temps = 0;
 uint8_t newt = 1;
-uint8_t hue = 45;
+uint8_t hue = 25;
 uint8_t hue_step = 1;
 uint8_t brightness = BRIGHTNESS;
 
 uint8_t segment = 0;
 
 CRGB correct(CRGB col) {
-  return CRGB(gamma8[col.r],gamma8[col.g],gamma8[col.b]);
+//  return CRGB(gamma8[col.r],gamma8[col.g],gamma8[col.b]);
+  return col;
 }
 
 CRGB color(uint8_t temp)
@@ -76,8 +77,10 @@ uint8_t safeTemp(uint8_t y, uint8_t x)
 
 void updateTs(uint8_t os)
 {
-    tbuff[temps][HEIGHT][0] = random8(140,225);
-    tbuff[temps][HEIGHT][1] = random8(140,225);
+    if (random8() > 120)
+      tbuff[temps][HEIGHT][0] = random8(120,190);
+    if (random8() > 120)
+      tbuff[temps][HEIGHT][1] = random8(120,190);
     
     tbuff[newt][HEIGHT][0]=0;
     tbuff[newt][HEIGHT][1]=0;
@@ -87,7 +90,7 @@ void updateTs(uint8_t os)
       tbuff[newt][y][x] = scale8(tbuff[temps][y+os][x],176);
       for (uint8_t row = 0; row < 3; row++) {
         for (uint8_t col = 0; col < 3; col++) {
-          tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, x + col - 1)>>3, 90);
+          tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, x + col - 1)>>3, random8(50,70));
         }
       }
     }
