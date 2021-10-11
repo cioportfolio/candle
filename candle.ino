@@ -30,11 +30,11 @@ uint8_t gamma8[] = {
 #define BRIGHTNESS 64
 #define UPDATES_PER_SECOND 20
 
-#define HEIGHT 14
-#define NUM_LEDS (HEIGHT * 2)
-CRGB leds[ NUM_LEDS ];
+#define HEIGHT 9
+#define NUM_LEDS (HEIGHT * 3 +1)
+CRGB leds[ NUM_LEDS];
 
-uint8_t tbuff[2][HEIGHT+1][2];
+uint8_t tbuff[3][HEIGHT+1][3];
 uint8_t temps = 0;
 uint8_t newt = 1;
 uint8_t hue = 45;
@@ -63,12 +63,13 @@ void genDisplay()
   for (uint8_t y=0; y<HEIGHT; y++){
       leds[HEIGHT-1-y]=correct(color(tbuff[temps][y][0]));
       leds[HEIGHT+y]=correct(color(tbuff[temps][y][1]));
+      leds[3*HEIGHT-y]=correct(color(tbuff[temps][y][2]));
   }
 }
 
 uint8_t safeTemp(uint8_t y, uint8_t x)
 {
-  if (x < 2 && y < HEIGHT+1) {
+  if (x < 3 && y < HEIGHT+1) {
     return tbuff[temps][y][x];
   }
   return 0;
@@ -76,18 +77,24 @@ uint8_t safeTemp(uint8_t y, uint8_t x)
 
 void updateTs(uint8_t os)
 {
-    tbuff[temps][HEIGHT][0] = random8(140,225);
-    tbuff[temps][HEIGHT][1] = random8(140,225);
+    tbuff[temps][HEIGHT][0] = random8(70,225);
+    tbuff[temps][HEIGHT][1] = random8(70,225);
+    tbuff[temps][HEIGHT][2] = random8(70,225);
     
     tbuff[newt][HEIGHT][0]=0;
     tbuff[newt][HEIGHT][1]=0;
+    tbuff[newt][HEIGHT][3]=0;
     
   for (uint8_t y=0; y < HEIGHT;y++){
-    for (uint8_t x=0; x <2 ; x++) {
+    for (uint8_t x=0; x <3 ; x++) {
       tbuff[newt][y][x] = scale8(tbuff[temps][y+os][x],176);
       for (uint8_t row = 0; row < 3; row++) {
         for (uint8_t col = 0; col < 3; col++) {
-          tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, x + col - 1)>>3, 90);
+          if (col==0 && x==0) {
+            tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, 2)>>3, 60);            
+          } else {
+            tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, x + col - 1)>>3, 60);
+          }
         }
       }
     }
