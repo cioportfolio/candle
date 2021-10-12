@@ -28,7 +28,7 @@ uint8_t gamma8[] = {
 #define CHIPSET     WS2812B
 
 #define BRIGHTNESS 128
-#define UPDATES_PER_SECOND 60
+#define UPDATES_PER_SECOND 40
 
 #define HEIGHT 9
 #define NUM_LEDS (HEIGHT * 3 +1)
@@ -78,11 +78,11 @@ uint8_t safeTemp(uint8_t y, uint8_t x)
 
 void updateTs(uint8_t os)
 {
-    if (random8() > 120)
+    if (random8() > 80)
       tbuff[temps][HEIGHT][0] = random8(120,190);
-    if (random8() > 120)
+    if (random8() > 80)
       tbuff[temps][HEIGHT][1] = random8(120,190);
-    if (random8() > 120)
+    if (random8() > 80)
       tbuff[temps][HEIGHT][2] = random8(120,190);
     
     tbuff[newt][HEIGHT][0]=0;
@@ -91,13 +91,13 @@ void updateTs(uint8_t os)
     
   for (uint8_t y=0; y < HEIGHT;y++){
     for (uint8_t x=0; x <3 ; x++) {
-      tbuff[newt][y][x] = scale8(tbuff[temps][y+os][x],176);
+      tbuff[newt][y][x] = scale8(tbuff[temps][y+os][x],120);
       for (uint8_t row = 0; row < 3; row++) {
         for (uint8_t col = 0; col < 3; col++) {
           uint8_t c = x + col - 1;
           if (col==0 && x==0)
             c = 2;
-          tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, c)>>3, random8(50,70));
+          tbuff[newt][y][x]+=scale8(safeTemp(y + row + os - 1, c)>>3, random8(40,60));
         }
       }
     }
